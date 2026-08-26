@@ -6,20 +6,21 @@ import { useDimensions } from './useDimensions';
 interface DataPoint {
   x: number;
   y: number;
+  r: number;
 }
 
 const data: DataPoint[] = [
-  { x: 132, y: 391 },
-  { x: 330, y: 349 },
-  { x: 410, y: 192 },
-  { x: 527, y: 257 },
-  { x: 688, y: 119 },
-  { x: 878, y: 55 },
+  { x: 132, y: 391, r: 30},
+  { x: 330, y: 349, r: 32},
+  { x: 410, y: 192, r: 25},
+  { x: 527, y: 257, r:40},
+  { x: 688, y: 119, r:17},
+  { x: 878, y: 55, r:38},
+  { x: 250, y: 143, r:22},
 ];
 
 const ORIGINAL_WIDTH = 960;
 const ORIGINAL_HEIGHT = 500;
-const RADIUS = 34;
 
 export function ResponsivePseudoScatterPlot() {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -39,7 +40,8 @@ export function ResponsivePseudoScatterPlot() {
       .join('circle')
       .attr('cx', (d: DataPoint) => xScale(d.x))
       .attr('cy', (d: DataPoint) => yScale(d.y))
-      .attr('r', RADIUS);
+      .attr('r', (d: DataPoint) => d.r)
+      .attr('fill', 'blue');
   }, [dimensions]);
 
   return (
@@ -48,7 +50,7 @@ export function ResponsivePseudoScatterPlot() {
         ref={svgRef}
         className="absolute inset-0 w-full h-full"
         role="img"
-        aria-label="Responsive scatter plot showing 6 data points"
+        aria-label="Responsive scatter plot showing 7 data points"
       ></svg>
     </div>
   );
