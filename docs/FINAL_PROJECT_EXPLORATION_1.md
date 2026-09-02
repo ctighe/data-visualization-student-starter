@@ -9,8 +9,11 @@ Have the types of cyberattacks changed significantly- are there any attack vecto
 Mostly inspired by the dataset I found for the Week 02 assignment, located at https://espace.library.uq.edu.au/view/UQ:dfe5027. This dataset is limited to the 2004-2019 range, so I would want to find similar-quality datasets from more recent years to compare how their attribute distributions might have changed.
 
 https://www.crowdstrike.com/en-us/cybersecurity-101/cyberattacks/ai-powered-cyberattacks/
+
 https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/
+
 https://cybermap.kaspersky.com/
+
 (Probably can't do anything quite as fancy as the live-updating cybermap, but something similar in terms of attack visualizations)
 
 My hand-drawn art skills are already not very good, so making these rough approximations means most of the content is going to be in the explanations. Also my phone doesn't have a good camera so I tried to explain as much as I could to get around the blurry images.
