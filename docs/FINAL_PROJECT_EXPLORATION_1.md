@@ -26,3 +26,8 @@ Globe view- for looking at attacks that exfiltrated records or some measurable a
 
 <img width="2340" height="4160" alt="KIMG0318" src="https://github.com/user-attachments/assets/d7405e97-1877-4833-880a-acfc92cbe0b4" />
 3D grid view- I was imagining a 2D grid with selectable (ordinal) attributes (in this drawing, scale and data sensitivity) that could also give a more physical sense of scale for the data. The viewer would be able to rotate the view and see how various attributes correlated with each other in a more freeform way that doesn't rely on simple bar charts or scatterplots. I was also thinking about having two duplicated versions, maybe one mirrored underneath, with one showing "normal" or pre-AI cyberattacks while the other shows post-AI cyberattacks. The goal would be to have them update in sync as the user rotates or changes axis attributes to directly show how the patterns in cyberattacks changed as AI got more prevalent. It might also be useful to have a slider for when the user wants to make the division between the two graphs, perhaps with a suggested "this is where AI got more capable" range highlighted.
+
+### Task Analysis
+
+I want to analyze how the types and targets of cyberattacks have changed since AI started becoming more powerful by looking at the occurrence rates of various kinds of cyberattacks (phishing, malware, impersonation scams, etc) over time, with markers for releases/improvements of particularly significant AI tools like ChatGPT, Dall-E, and other generative tools. 
+I also want to see if AI-assisted scams/cyberattacks are more targeted towards specific sizes of companies or organizations, and whether certain types of cyberattacks became more common with the advent of new AI tools.
