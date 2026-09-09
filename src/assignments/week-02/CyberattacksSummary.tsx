@@ -8,7 +8,7 @@ interface Summary {
   columns: number;
 }
 
-interface CyberattacksRow {
+export interface CyberattacksRow {
   year: number;
   organisation: string;
   critical_industry: string;
@@ -54,14 +54,7 @@ interface CyberattacksRow {
   summary: string;
 }
 
-const DATA_URL = `${import.meta.env.BASE_URL}datasets/cyberattacks/cyberattacks.csv`;
-
-const FONT_SIZE = 28;
-const LINE_HEIGHT = FONT_SIZE * 1.2;
-
-export function CyberattacksSummary() {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const { ref: divRef, dimensions } = useDimensions();
+export function useCyberattacksDataset() {
   const [data, setData] = useState<CyberattacksRow[] | null>(null);
 
   useEffect(() => {
@@ -128,6 +121,20 @@ export function CyberattacksSummary() {
       cancelled = true;
     };
   }, []);
+
+  return data;
+}
+
+const DATA_URL = `${import.meta.env.BASE_URL}datasets/cyberattacks/cyberattacks.csv`;
+
+const FONT_SIZE = 28;
+const LINE_HEIGHT = FONT_SIZE * 1.2;
+
+export function CyberattacksSummary() {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const { ref: divRef, dimensions } = useDimensions();
+  const data = useCyberattacksDataset();
+  
 
   const summary = useMemo<Summary | null>(() => {
     if (!data) return null;

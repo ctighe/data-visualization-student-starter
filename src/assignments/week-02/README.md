@@ -26,7 +26,7 @@ PhD project.
 |---|---|---|---|---|
 | 1 | `Year` | date | Year of the cyber attack | `2016` |
 | 2 | `Organisation` | categorical | The targeted organisation | `AOL` |
-| 3 | `Critical Industry` | bcategorical | Is the organisation part of a critical industry | `Yes` |
+| 3 | `Critical Industry` | categorical | Is the organisation part of a critical industry | `Yes` |
 | 4 | `Organisation size` | categorical | Relative size of the organisation | `Medium` |
 | 5 | `Level of digital intensity` | categorical | How involved/intense the attack was | `Low-Medium` |
 | 6 | `Sector` | categorical | What sector is the organisation in | `Human health activities` |
@@ -35,7 +35,7 @@ PhD project.
 | 9 | `Cyber security framework` | categorical | Was there a cybersec framework at the organisation | `Yes` |
 | 10 | `Education and awareness policy` | categorical | Was there an education/awareness policy in place at the organisation | `No` |
 | 11 | `Policy` | categorical | Not explained- unsure | `Yes` |
-| 12 | `Prevention, Detection and Recovery` | | categorical | How much PDR control did the organisation have | `Low` |
+| 12 | `Prevention, Detection and Recovery` | | categorical | How much PDR control did the organisation have |
 | 13 | `Improper network segmentation` | categorical | Did the organisation not separate sensitive parts of their netowrk | `Yes` |
 | 14 | `Inappropriate remote access` | categorical | Did the organisation allow external actors to access their network | `No` |
 | 15 | `Absence of encryption` | categorical | Did the organisation use encryption | `No` |
@@ -57,7 +57,7 @@ PhD project.
 | 31 | `Track 1 - Credit card details leaked/exposed` | categorical | Were credit card details included in the leak | `Yes` |
 | 32 | `Track 2 - Credit card details leaked/exposed` | categorical | Were more detailed versions of credit card info included in the leak | `No` |
 | 33 | `Social security number/tax number leaked/exposed` | categorical | Were SSNs/ tax numbers included in the leak | `Yes` |
-| 34 | `Subsequent fraudulent use of data` | categorical | Was the data fraudulently used after the leak | `No` | 
+| 34 | `Subsequent fraudulent use of data` | categorical | Was the data fraudulently used after the leak | `No` |
 | 35 | `Investigation` | categorical | Was there an investigation into the leak | `No` |
 | 36 | `Undertook investigation` | categorical | Did the organisation run the investigation | `No` |
 | 37 | `Litigation by public` | categorical | Was there a class-action or similar lawsuit against the organisation by the public related to the attack | `No` |
