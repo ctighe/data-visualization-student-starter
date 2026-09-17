@@ -31,3 +31,19 @@ Globe view- for looking at attacks that exfiltrated records or some measurable a
 
 I want to analyze how the types and targets of cyberattacks have changed since AI started becoming more powerful by looking at the occurrence rates of various kinds of cyberattacks (phishing, malware, impersonation scams, etc) over time, with markers for releases/improvements of particularly significant AI tools like ChatGPT, Dall-E, and other generative tools. 
 I also want to see if AI-assisted scams/cyberattacks are more targeted towards specific sizes of companies or organizations, and whether certain types of cyberattacks became more common with the advent of new AI tools.
+
+
+### Validation
+
+<b>Domain:</b> 
+I think the specific domain I would be targeting is one of two options, or maybe both. One group is AI researchers who want to know what kinds of cyber-threats AI (or AI-enabled humans) cause, what types of attacks are more common in an AI-empowered world, and what types of targets are being hit. The goal would be to use this understanding to develop stronger safeguards to keep AI safer and reduce the dangerous potential of misuse for those specific types of scenarios.  The other group I'm thinking of would be industry cybersecurity specialists, especially those who are trying to convince their higher-ups to invest in better security training for employees. Having a way to clearly display how the threats are changing over time as AI gets more powerful and understand what the most common attack types are to recommend specific training or system changes seems like it would be very useful.
+
+<b>Task/Data:</b> 
+The specific tasks that I'm looking to enable or support would be trend detection/recognition and communicating priorities. I would also probably do a little bit of transformation in the form of aggregation and/or summarizing to help make the visualizations cleaner.
+The data blocks I'd be working with are probably mostly categorical-based data, with some ordinal data as well. Since the "ideal user" is looking for either larger-scale trends or are more narrowly-scoped filterable subset of the data, preserving the category structure and focusing on summaries of those layers and comparing those summaries between the two time periods would be the main goal.
+
+<b>Idiom:</b> 
+The visual encoding idiom/design that I would focus on is heavily comparison-based. The entire goal of the visualizations would be to do a large-scale comparison between pre-AI and post-AI cyberattacks, so the design should reflect that. I think having a linked dual view of the data, where one side contains one time window and the other side contains the remaining time window, would be the most immediate approach. The scaling between the two views might be a little off though, so I could also see having a kind of overlay of the two time windows in the same view (and thus the same scale) could help with keeping consistent comparisons in the visualizations. My concern with overlays would be visual clarity and noise, so there would have to be more focus on keeping the viz clean and simple to allow for the overlay to still be useful.
+
+<b>Algorithm:</b>
+The main algorithm work that would go into this kind of viz would be ensuring that the data can be cleanly filtered/operated on in both views/time windows at the same time. Considering that there isn't a clean pre-AI and post-AI boundary, having some sort of user-defined threshold or boundary window would make the most sense, and that would cause some extra issues for computing all the aggregate/summary statistics every time the user tweaks the date threshold. One possible way of handling this would be to pre-compute the appropriate statistics for each large date range (say, for each year) and then only compute the final summary statistics for the viz from those chunked mini-summaries. This would likely result in significant improvements in responsiveness.
