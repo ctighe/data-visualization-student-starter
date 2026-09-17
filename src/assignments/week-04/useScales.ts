@@ -1,0 +1,53 @@
+import { useMemo } from 'react';
+import { extent } from 'd3-array';
+import { scaleLinear, scaleLog } from 'd3-scale';
+import type { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
+import type { CyberattacksRow } from '../week-02/CyberattacksSummary';
+import type { Margin } from './margin';
+
+export interface Accessor {
+  (row: CyberattacksRow): number;
+}
+
+export interface UseScalesOptions {
+  data: CyberattacksRow[] | null;
+  width: number;
+  height: number;
+  margin: Margin;
+  xValue: Accessor;
+  yValue: Accessor;
+}
+
+export interface Scales {
+  xScale: ScaleLinear<number, number>;
+  yScale: ScaleLogarithmic<number, number>;
+}
+
+export function useScales({
+  data,
+  width,
+  height,
+  margin,
+  xValue,
+  yValue,
+}: UseScalesOptions): Scales | null {
+  return useMemo(() => {
+    // No data yet, so no scales can be constructed.
+    if (!data) return null;
+
+    // The domain maps data space, and the range maps to screen space.
+    // The range is inset by the margin so the plot area leaves room
+    // for the axes and labels around it.
+    const xScale = scaleLinear()
+      // `extent` returns the min and max of the data for the domain.
+      .domain(extent(data, xValue) as [number, number])
+      .range([margin.left*1.1, width - margin.right]);
+
+    // Flip the y range so that larger values appear higher on the screen.
+    const yScale = scaleLog()
+      .domain(extent(data, yValue) as [number, number])
+      .range([height - margin.bottom, margin.top]);
+
+    return { xScale, yScale };
+  }, [data, width, height, margin, xValue, yValue]);
+}
