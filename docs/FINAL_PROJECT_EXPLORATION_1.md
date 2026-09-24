@@ -47,3 +47,10 @@ The visual encoding idiom/design that I would focus on is heavily comparison-bas
 
 <b>Algorithm:</b>
 The main algorithm work that would go into this kind of viz would be ensuring that the data can be cleanly filtered/operated on in both views/time windows at the same time. Considering that there isn't a clean pre-AI and post-AI boundary, having some sort of user-defined threshold or boundary window would make the most sense, and that would cause some extra issues for computing all the aggregate/summary statistics every time the user tweaks the date threshold. One possible way of handling this would be to pre-compute the appropriate statistics for each large date range (say, for each year) and then only compute the final summary statistics for the viz from those chunked mini-summaries. This would likely result in significant improvements in responsiveness.
+
+### Updated Alterations
+
+Because of the specific focus I decided on in the task analysis step, I realized that having a geographic/map-based visualization is probably not a good fit. The type of comparison I want to support with the visualizations isn't especially tied to geographic locations, so it's a less important idiom to focus on. 
+
+<img width="4160" height="2340" alt="image" src="https://github.com/user-attachments/assets/c489da9b-efb0-48bb-8313-286e91b33ceb" />
+This is an approximation of my "north star" goal for the final project. Ideally I'd like to create a dual-view comparison viz dashboard with a high degree of user customization. I want the user to be able to compare parts of a dataset in multiple possible views, while being able to define how they want to split the data between the views. I also had an interesting idea of letting the user build their own derived attribute to visualize. The thought was that by giving the user the ability to select and define how they want to aggregate and display the data, it would encourage more play-like exploration of the dataset and potentially lead to more interesting discoveries of patterns or trends in the data.
