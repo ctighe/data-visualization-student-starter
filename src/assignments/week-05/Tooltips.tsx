@@ -7,7 +7,7 @@ import { Axes } from './Axes';
 import { Labels } from './Labels';
 import { VoronoiOverlay } from './VoronoiOverlay';
 import { Tooltip } from './Tooltip';
-import { margin, xValue, yValue } from './config';
+import { axisLabelFontSize, margin, noteText, xAxisLabelOffset, xValue, yNoteTextOffset, yValue } from './config';
 
 const numberFormat = new Intl.NumberFormat('en-US');
 
@@ -52,6 +52,9 @@ export function Tooltips() {
   const tooltipX = hoveredRow && scales ? scales.xScale(xValue(hoveredRow)) : 0;
   const tooltipY = hoveredRow && scales ? scales.yScale(yValue(hoveredRow)) : 0;
 
+  const plotCenterX = margin.left + (dimensions.width - margin.left - margin.right) / 2;
+  const plotCenterY = margin.top + (dimensions.height - margin.top - margin.bottom) / 2;
+
   return (
     <div ref={divRef} className="relative w-full h-full">
       <svg
@@ -88,6 +91,17 @@ export function Tooltips() {
               margin={margin}
             />
             <Labels width={dimensions.width} height={dimensions.height} margin={margin} />
+            <g className="note">
+          <text
+            className="noteText"
+            x={plotCenterX}
+            y={dimensions.height - margin.bottom + xAxisLabelOffset + yNoteTextOffset}
+            textAnchor="middle"
+            fontSize={axisLabelFontSize}
+          >
+            {noteText}
+          </text>
+        </g>
           </>
         )}
       </svg>
