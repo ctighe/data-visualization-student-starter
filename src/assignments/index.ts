@@ -3,6 +3,7 @@ import { ResponsivePseudoScatterPlot } from './week-01/ResponsivePseudoScatterPl
 import { CyberattacksSummary } from './week-02/CyberattacksSummary';
 import { FirstVis } from './week-03/FirstVis';
 import { ImprovedVis } from './week-04/ImprovedVis'
+import { Tooltips } from './week-05/Tooltips';
 
 export interface Assignment {
   id: string;
@@ -30,7 +31,12 @@ export const assignments: Assignment[] = [
     id: '4',
     name: 'Week 4',
     component: ImprovedVis,
-  }
+  },
+  {
+    id: '5',
+    name: 'Week 5',
+    component: Tooltips,
+  },
 ];
 
 export const assignmentsMap = new Map(assignments.map((ex) => [ex.id, ex]));
