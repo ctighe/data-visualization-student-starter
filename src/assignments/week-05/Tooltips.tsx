@@ -53,7 +53,6 @@ export function Tooltips() {
   const tooltipY = hoveredRow && scales ? scales.yScale(yValue(hoveredRow)) : 0;
 
   const plotCenterX = margin.left + (dimensions.width - margin.left - margin.right) / 2;
-  const plotCenterY = margin.top + (dimensions.height - margin.top - margin.bottom) / 2;
 
   return (
     <div ref={divRef} className="relative w-full h-full">
