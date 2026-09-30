@@ -4,6 +4,7 @@ import { CyberattacksSummary } from './week-02/CyberattacksSummary';
 import { FirstVis } from './week-03/FirstVis';
 import { ImprovedVis } from './week-04/ImprovedVis'
 import { Tooltips } from './week-05/Tooltips';
+import { ProjV1 } from './week-06/ProjV1';
 
 export interface Assignment {
   id: string;
@@ -37,6 +38,11 @@ export const assignments: Assignment[] = [
     name: 'Week 5',
     component: Tooltips,
   },
+  {
+    id: '6',
+    name: 'Week 6',
+    component: ProjV1,
+  }
 ];
 
 export const assignmentsMap = new Map(assignments.map((ex) => [ex.id, ex]));
