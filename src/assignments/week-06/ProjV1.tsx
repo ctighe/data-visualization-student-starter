@@ -7,7 +7,7 @@ import { Axes } from './Axes';
 import { Labels } from './Labels';
 import { VoronoiOverlay } from './VoronoiOverlay';
 import { Tooltip } from './Tooltip';
-import { margin, numPanes, xValue, yValue } from './config';
+import { margin, xValue, yValue } from './config';
 
 const numberFormat = new Intl.NumberFormat('en-US');
 
