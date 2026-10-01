@@ -7,7 +7,7 @@ import { Axes } from './Axes';
 import { Labels } from './Labels';
 import { VoronoiOverlay } from './VoronoiOverlay';
 import { Tooltip } from './Tooltip';
-import { axisLabelFontSize, margin, noteText, numPanes, xAxisLabelOffset, xValue, yNoteTextOffset, yValue } from './config';
+import { margin, numPanes, xValue, yValue } from './config';
 
 const numberFormat = new Intl.NumberFormat('en-US');
 
@@ -76,8 +76,6 @@ export function ProjV1() {
 
   // const tooltipX = hoveredRow && hoveredPane && scales[0] && scales[1] ? scales[hoveredPane].xScale(xValue(hoveredRow)) : 0;
   // const tooltipY = hoveredRow && hoveredPane && scales[0] && scales[1] ? leftScales.yScale(yValue(leftHoveredRow)) : 0;
-
-  const plotCenterX = margin.left + (dimensions.width - margin.left - margin.right) / 2;
 
   return (
     <><div ref={divRef} className="relative w-full h-full">
