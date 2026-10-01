@@ -11,7 +11,6 @@ export interface VoronoiOverlayProps {
   yScale: ScaleLinear<number, number>;
   xValue: (row: CyberattacksRow) => number;
   yValue: (row: CyberattacksRow) => number;
-  width: number;
   height: number;
   margin: Margin;
   setHoveredIndex: (index: number | null) => void;
@@ -24,7 +23,6 @@ export function VoronoiOverlay({
   yScale,
   xValue,
   yValue,
-  width,
   height,
   margin,
   setHoveredIndex,
@@ -42,13 +40,12 @@ export function VoronoiOverlay({
       yScale,
       xValue,
       yValue,
-      width,
       height,
       margin,
       setHoveredIndex,
       showVoronoi,
     });
-  }, [data, xScale, yScale, xValue, yValue, width, height, margin, setHoveredIndex, showVoronoi]);
+  }, [data, xScale, yScale, xValue, yValue, height, margin, setHoveredIndex, showVoronoi]);
 
   return <g ref={groupRef} className="voronoi-overlay" />;
 }

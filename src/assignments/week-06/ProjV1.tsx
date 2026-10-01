@@ -125,7 +125,6 @@ export function ProjV1() {
                   yScale={scales[0].yScale}
                   xValue={xValue}
                   yValue={yValue}
-                  width={dimensions.width / numPanes}
                   height={dimensions.height}
                   margin={margin}
                   setHoveredIndex={setLHoveredIndex}
@@ -154,7 +153,6 @@ export function ProjV1() {
                   yScale={scales[1].yScale}
                   xValue={xValue}
                   yValue={yValue}
-                  width={dimensions.width / numPanes}
                   height={dimensions.height}
                   margin={margin}
                   setHoveredIndex={setRHoveredIndex}

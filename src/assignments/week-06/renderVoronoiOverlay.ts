@@ -10,7 +10,6 @@ export interface RenderVoronoiOverlayOptions {
   yScale: ScaleLinear<number, number>;
   xValue: (row: CyberattacksRow) => number;
   yValue: (row: CyberattacksRow) => number;
-  width: number;
   height: number;
   margin: Margin;
   setHoveredIndex: (index: number | null) => void;
@@ -31,7 +30,6 @@ export function renderVoronoiOverlay(
     yScale,
     xValue,
     yValue,
-    width,
     height,
     margin,
     setHoveredIndex,
