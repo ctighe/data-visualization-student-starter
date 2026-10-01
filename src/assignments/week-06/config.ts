@@ -7,7 +7,7 @@ export const yValue = (row: CyberattacksRow) => row.num_users_affected;
 
 // Chart configuration. All tweakable values live here in one place so they
 // can be adjusted without hunting through the components and render functions.
-export const margin: Margin = { top: 60, right: 20, bottom: 200, left: 60 };
+export const margin: Margin = { top: 60, right: 20, bottom: 120, left: 60 };
 export const title = 'Publicly Acknowledged Cyberattacks';
 export const titleFontSize = 20;
 export const xAxisLabel = 'Year';
