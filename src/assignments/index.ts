@@ -5,6 +5,7 @@ import { FirstVis } from './week-03/FirstVis';
 import { ImprovedVis } from './week-04/ImprovedVis'
 import { Tooltips } from './week-05/Tooltips';
 import { ProjV1 } from './week-06/ProjV1';
+import { GlobeViewer } from './week-07/GlobeViewerV2';
 
 export interface Assignment {
   id: string;
@@ -42,6 +43,11 @@ export const assignments: Assignment[] = [
     id: '6',
     name: 'Week 6',
     component: ProjV1,
+  },
+  {
+    id: '7',
+    name: 'Week 7',
+    component: GlobeViewer,
   }
 ];
 
