@@ -32,8 +32,11 @@ export interface PaneContext {
   colorFor: (row: CyberattacksRow) => string;
   hoveredIndex: number | null;
   setHoveredIndex: (index: number | null) => void;
-  // Styles that can map a row to screen coordinates report a `positionOf`
-  // function here so the shell can anchor the shared tooltip.
+  // Styles that can map a row to screen coordinates publish a `positionOf`
+  // function through this callback so the shell can anchor the shared tooltip.
+  // It is a plain callback (not a state setter): the shell stores the value in
+  // a ref, so publishing a function value is safe and requires no updater
+  // wrapper.
   setPositionOf: (positionOf: PositionOf | null) => void;
   // The categorical field the bar style aggregates by. Unused by scatter but
   // carried on the shared context so style components stay stateless.
@@ -47,6 +50,11 @@ export interface VizStyle {
   label: string;
   Pane: ComponentType<PaneContext>;
   Controls?: ComponentType<VizControlsProps>;
+  // Extra space (px) the style needs below the plot for its x-axis ticks and
+  // axis label. The shell adds this to the base margin's bottom so styles with
+  // larger labels (e.g. the bar chart's rotated categories) never collide with
+  // the controls below the visualization.
+  bottomMargin: number;
 }
 
 export interface VizControlsProps {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDimensions } from './useDimensions';
 import { useCyberattacksDataset } from '../week-05/CyberattacksSummary';
@@ -35,8 +35,13 @@ export function Week8() {
 
   const [lHoveredIndex, setLHoveredIndex] = useState<number | null>(null);
   const [rHoveredIndex, setRHoveredIndex] = useState<number | null>(null);
-  const [lPositionOf, setLPositionOf] = useState<PositionOf | null>(null);
-  const [rPositionOf, setRPositionOf] = useState<PositionOf | null>(null);
+  // Each pane owns its scales, so it publishes a `positionOf` callback that
+  // maps a hovered row to local screen coordinates. The shell keeps those
+  // callbacks in refs rather than state: a function passed to `useState` is
+  // mistaken for an updater function and silently dropped. Refs sidestep that
+  // React footgun, and hovering already triggers the render that reads them.
+  const lPositionOfRef = useRef<PositionOf | null>(null);
+  const rPositionOfRef = useRef<PositionOf | null>(null);
 
   // Some rows have missing measurements (NA), which would map to undefined
   // positions. Drop those rows so every mark maps to a valid location.
@@ -85,12 +90,26 @@ export function Week8() {
 
   const activeStyle = getVizStyle(vizStyleId);
 
+  // The bottom margin adapts to the active style so larger x-axis labels
+  // (e.g. the bar chart's rotated categories) never collide with the style
+  // selector below the plot.
+  const activeMargin = { ...margin, bottom: activeStyle.bottomMargin };
+
   const hoveredIndexFor = (pane: PaneId) =>
     pane === 1 ? lHoveredIndex : rHoveredIndex;
   const setHoveredIndexFor = (pane: PaneId) =>
     pane === 1 ? setLHoveredIndex : setRHoveredIndex;
+
+  // Stable publish callbacks so a pane's registration effect only reruns when
+  // its own `positionOf` identity changes, not on every shell render.
+  const publishLPositionOf = useCallback((positionOf: PositionOf | null) => {
+    lPositionOfRef.current = positionOf;
+  }, []);
+  const publishRPositionOf = useCallback((positionOf: PositionOf | null) => {
+    rPositionOfRef.current = positionOf;
+  }, []);
   const setPositionOfFor = (pane: PaneId) =>
-    pane === 1 ? setLPositionOf : setRPositionOf;
+    pane === 1 ? publishLPositionOf : publishRPositionOf;
 
   // Bounds-check the hovered indices: a split change re-partitions the rows
   // while an old index may still be stored, so an out-of-range index must
@@ -107,12 +126,20 @@ export function Week8() {
       ? 2
       : null;
 
-  const activePositionOf = hoveredPane === 1 ? lPositionOf : rPositionOf;
+  // The position callbacks are stored in refs (see above), so reading them
+  // here intentionally bypasses React's "no refs in render" rule. It is safe
+  // in this component: `positionOf` is only used to anchor the tooltip, and
+  // every input that can change it (dimensions, split, rows) already triggers
+  // a shell render, so the value is fresh whenever a tooltip is shown.
+  /* eslint-disable react-hooks/refs */
+  const activePositionOf =
+    hoveredPane === 1 ? lPositionOfRef.current : rPositionOfRef.current;
   const tooltipPoint =
     hoveredRow && activePositionOf ? activePositionOf(hoveredRow) : null;
+  /* eslint-enable react-hooks/refs */
 
   return (
-    <div ref={divRef} className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col">
       <div className="flex h-10 w-full shrink-0">
         <label className="flex w-full items-center justify-center gap-2">
           <span>Year to split the data:</span>
@@ -131,7 +158,7 @@ export function Week8() {
         </label>
       </div>
 
-      <div className="relative min-h-0 flex-1">
+      <div ref={divRef} className="relative min-h-0 flex-1">
         <svg className="absolute inset-0 h-full w-full" role="img" aria-label="">
           {dimensions.width > 0 && dimensions.height > 0 && (
             <>
@@ -140,7 +167,7 @@ export function Week8() {
                 rows={leftRows}
                 width={dimensions.width}
                 height={dimensions.height}
-                margin={margin}
+                margin={activeMargin}
                 colorFor={colorFor}
                 barField={barField}
                 hoveredIndex={hoveredIndexFor(1)}
@@ -152,7 +179,7 @@ export function Week8() {
                 rows={rightRows}
                 width={dimensions.width}
                 height={dimensions.height}
-                margin={margin}
+                margin={activeMargin}
                 colorFor={colorFor}
                 barField={barField}
                 hoveredIndex={hoveredIndexFor(2)}

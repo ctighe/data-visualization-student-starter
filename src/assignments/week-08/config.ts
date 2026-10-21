@@ -7,13 +7,13 @@ export const yValue = (row: CyberattacksRow) => row.num_users_affected;
 
 // Chart configuration. All tweakable values live here in one place so they
 // can be adjusted without hunting through the components and render functions.
-export const margin: Margin = { top: 60, right: 20, bottom: 120, left: 60 };
+export const margin: Margin = { top: 60, right: 20, bottom: 20, left: 60 };
 export const title = 'Publicly Acknowledged Cyberattacks';
 export const titleFontSize = 20;
 export const xAxisLabel = 'Year';
 export const yAxisLabel = 'Number of Users Affected (LOG)';
 export const axisLabelFontSize = 14;
-export const xAxisLabelOffset = 40;
+export const xAxisLabelOffset = 140;
 export const yAxisLabelOffset = 40;
 export const noteText = '2019 data is incomplete';
 export const yNoteTextOffset = 40;

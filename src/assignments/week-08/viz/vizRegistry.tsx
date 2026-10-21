@@ -11,12 +11,15 @@ export const VIZ_STYLES: Record<VizStyleId, VizStyle> = {
     id: 'scatter',
     label: 'Scatter plot',
     Pane: ScatterPane,
+    bottomMargin: 80,
   },
   bar: {
     id: 'bar',
     label: 'Bar chart',
     Pane: BarPane,
     Controls: BarControls,
+    // Rotated category labels plus the axis label need more room than scatter.
+    bottomMargin: 120,
   },
 };
 
