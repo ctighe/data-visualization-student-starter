@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-AGENT_QUICKSTART.md
+AGENT_PROMPTS
 
 # Editor directories and files
 .vscode/*
