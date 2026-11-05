@@ -13,6 +13,7 @@ export interface MarksProps {
   hoveredIndex: number | null;
   colorFor: (row: CyberattacksRow) => string;
   highlightedImpact: string | null;
+  selectedRows: ReadonlySet<CyberattacksRow> | null;
 }
 
 export function Marks({
@@ -24,6 +25,7 @@ export function Marks({
   hoveredIndex,
   colorFor,
   highlightedImpact,
+  selectedRows,
 }: MarksProps) {
   const groupRef = useRef<SVGGElement>(null);
 
@@ -40,8 +42,19 @@ export function Marks({
       hoveredIndex,
       colorFor,
       highlightedImpact,
+      selectedRows,
     });
-  }, [data, xScale, yScale, xValue, yValue, hoveredIndex, colorFor, highlightedImpact]);
+  }, [
+    data,
+    xScale,
+    yScale,
+    xValue,
+    yValue,
+    hoveredIndex,
+    colorFor,
+    highlightedImpact,
+    selectedRows,
+  ]);
 
   return <g ref={groupRef} className="marks" />;
 }

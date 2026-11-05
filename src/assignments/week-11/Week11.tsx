@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDimensions } from './useDimensions';
 import { useCyberattacksDataset } from './CyberattacksSummary';
@@ -7,7 +7,7 @@ import { getVizStyle } from './viz/vizRegistry';
 import { Tooltip } from './viz/shared/Tooltip';
 import { colorForImpact } from './viz/shared/colorScale';
 import { ColorLegend } from './viz/scatter/ColorLegend';
-import type { PaneId, VizStyleId, BarField, PositionOf } from './viz/types';
+import type { PaneId, VizStyleId, BarField, BarMetric, PositionOf, RowSelection } from './viz/types';
 import type { CyberattacksRow } from '../week-02/CyberattacksSummary';
 import { margin, xValue, yValue } from './config';
 
@@ -31,9 +31,16 @@ export function Week11() {
   // boundary); the slider displays the rounded year.
   const [timeSplit, setTimeSplit] = useState(2014.5);
   const [barField, setBarField] = useState<BarField>('attack_type');
+  // What the bar y-axis encodes: attack counts or summed users affected.
+  const [barMetric, setBarMetric] = useState<BarMetric>('count');
   // Bar y-domain sharing toggle. Off by default, which keeps each bar pane
   // scaled to its own largest category count.
   const [barShareYDomain, setBarShareYDomain] = useState(false);
+
+  // Rows selected in one view, to be emphasized in the others. Multi-select:
+  // clicking a bar toggles it, while Esc / "Clear highlights" clears all.
+  // Selections deliberately survive bar-field, metric, and time-split changes.
+  const [rowSelections, setRowSelections] = useState<RowSelection[]>([]);
 
   const [lHoveredIndex, setLHoveredIndex] = useState<number | null>(null);
   const [rHoveredIndex, setRHoveredIndex] = useState<number | null>(null);
@@ -73,6 +80,87 @@ export function Week11() {
 
   const colorFor = useCallback((row: CyberattacksRow) => colorForImpact(row.impact_data), []);
 
+  // Union of every active selection, as a Set for O(1) membership in the
+  // scatter's mark renderer. Null when nothing is selected.
+  const selectedRows = useMemo(() => {
+    if (rowSelections.length === 0) return null;
+    const union = new Set<CyberattacksRow>();
+    for (const selection of rowSelections) {
+      for (const row of selection.rows ?? []) union.add(row);
+    }
+    return union;
+  }, [rowSelections]);
+
+  // Toggle the bar clicked in `pane` in or out of the selection. Identity
+  // excludes the metric because the metric changes a bar's height, not the rows
+  // it contains (every category row is stored, per the linked-highlight spec).
+  const handleBarSelect = useCallback(
+    (pane: PaneId, key: string, contributingRows: CyberattacksRow[]) => {
+      const id = `bar|${barField}|${pane}|${key}`;
+      setRowSelections((current) => {
+        if (current.some((selection) => selection.id === id)) {
+          return current.filter((selection) => selection.id !== id);
+        }
+        return [
+          ...current,
+          {
+            source: 'bar',
+            id,
+            rows: contributingRows,
+            field: barField,
+            metric: barMetric,
+            pane,
+            key,
+          } satisfies RowSelection,
+        ];
+      });
+    },
+    [barField, barMetric],
+  );
+
+  const selectBarPane1 = useCallback(
+    (key: string, contributingRows: CyberattacksRow[]) => handleBarSelect(1, key, contributingRows),
+    [handleBarSelect],
+  );
+  const selectBarPane2 = useCallback(
+    (key: string, contributingRows: CyberattacksRow[]) => handleBarSelect(2, key, contributingRows),
+    [handleBarSelect],
+  );
+  const onBarSelectFor = (pane: PaneId) => (pane === 1 ? selectBarPane1 : selectBarPane2);
+
+  const clearHighlights = useCallback(() => setRowSelections([]), []);
+
+  // Add a scatter brush selection, dropping rows that are already selected so
+  // repeated or overlapping brushes never duplicate points.
+  const scatterSelectionId = useRef(0);
+  const handleScatterSelect = useCallback((brushRows: CyberattacksRow[]) => {
+    if (brushRows.length === 0) return;
+    const id = `scatter|${scatterSelectionId.current++}`;
+    setRowSelections((current) => {
+      const existing = new Set<CyberattacksRow>();
+      for (const selection of current) {
+        for (const row of selection.rows ?? []) existing.add(row);
+      }
+      const additions = brushRows.filter((row) => !existing.has(row));
+      if (additions.length === 0) return current;
+      return [...current, { source: 'scatter', id, rows: additions } satisfies RowSelection];
+    });
+  }, []);
+
+  // Esc clears highlights when any exist; otherwise it falls through to the
+  // app-wide handler that toggles the sidebar. Capture + stopImmediatePropagation
+  // lets us consume the key before that handler runs.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || rowSelections.length === 0) return;
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      setRowSelections([]);
+    };
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+  }, [rowSelections.length]);
+
   // Changing the split re-partitions the rows, so clear any hover state that
   // points into the old partition.
   const handleSplitChange = (year: number) => {
@@ -103,15 +191,20 @@ export function Week11() {
     () =>
       activeStyle.sharedYDomain?.(rows ?? [], {
         barField,
+        metric: barMetric,
         shareYDomain: barShareYDomain,
       }) ?? null,
-    [activeStyle, rows, barField, barShareYDomain],
+    [activeStyle, rows, barField, barMetric, barShareYDomain],
   );
 
   // The bottom margin adapts to the active style so larger x-axis labels
   // (e.g. the bar chart's rotated categories) never collide with the style
-  // selector below the plot.
-  const activeMargin = { ...margin, bottom: activeStyle.bottomMargin };
+  // selector below the plot. Memoized so a stable identity does not force the
+  // pane scale/brush effects to re-run on every hover render.
+  const activeMargin = useMemo(
+    () => ({ ...margin, bottom: activeStyle.bottomMargin }),
+    [activeStyle.bottomMargin],
+  );
 
   const hoveredIndexFor = (pane: PaneId) => (pane === 1 ? lHoveredIndex : rHoveredIndex);
   const setHoveredIndexFor = (pane: PaneId) => (pane === 1 ? setLHoveredIndex : setRHoveredIndex);
@@ -132,8 +225,14 @@ export function Week11() {
   const rowAt = (rows: CyberattacksRow[], index: number | null) =>
     index !== null && index >= 0 && index < rows.length ? rows[index] : null;
 
-  const leftHoveredRow = rowAt(leftRows, lHoveredIndex);
-  const rightHoveredRow = rowAt(rightRows, rHoveredIndex);
+  // The rows a pane actually renders. Single-pane styles give pane 1 all rows;
+  // dual-pane styles split at `timeSplit`. A pane's hover index is relative to
+  // this same array, so the tooltip lookup must resolve against it too.
+  const paneRowsFor = (pane: PaneId): CyberattacksRow[] =>
+    pane === 1 ? (paneCount === 1 ? rows ?? [] : leftRows) : rightRows;
+
+  const leftHoveredRow = rowAt(paneRowsFor(1), lHoveredIndex);
+  const rightHoveredRow = paneCount === 2 ? rowAt(paneRowsFor(2), rHoveredIndex) : null;
   const hoveredRow = leftHoveredRow ?? rightHoveredRow;
   const hoveredPane: PaneId | null = leftHoveredRow ? 1 : rightHoveredRow ? 2 : null;
 
@@ -175,17 +274,21 @@ export function Week11() {
             <>
               <activeStyle.Pane
                 pane={1}
-                rows={paneCount === 1 ? rows ?? [] : leftRows}
+                rows={paneRowsFor(1)}
                 width={dimensions.width}
                 height={dimensions.height}
                 margin={activeMargin}
                 yDomain={sharedYDomain}
                 colorFor={colorFor}
                 barField={barField}
+                barMetric={barMetric}
                 hoveredIndex={hoveredIndexFor(1)}
                 setHoveredIndex={setHoveredIndexFor(1)}
                 setPositionOf={setPositionOfFor(1)}
                 highlightedImpact={highlightedImpact}
+                selectedRows={selectedRows}
+                onBarSelect={onBarSelectFor(1)}
+                onBrushSelect={handleScatterSelect}
               />
               {paneCount === 2 && (
                 <activeStyle.Pane
@@ -197,10 +300,14 @@ export function Week11() {
                   yDomain={sharedYDomain}
                   colorFor={colorFor}
                   barField={barField}
+                  barMetric={barMetric}
                   hoveredIndex={hoveredIndexFor(2)}
                   setHoveredIndex={setHoveredIndexFor(2)}
                   setPositionOf={setPositionOfFor(2)}
                   highlightedImpact={highlightedImpact}
+                  selectedRows={selectedRows}
+                  onBarSelect={onBarSelectFor(2)}
+                  onBrushSelect={handleScatterSelect}
                 />
               )}
             </>
@@ -229,15 +336,23 @@ export function Week11() {
             setHighlightedImpact={setHighlightedImpact}
           />
         )}
-        <StyleSelector value={vizStyleId} onChange={setStyleId} />
+        <StyleSelector
+          value={vizStyleId}
+          onChange={setStyleId}
+          onClearHighlights={clearHighlights}
+          hasHighlights={rowSelections.length > 0}
+        />
         {activeStyle.Controls && (
           <div className="flex justify-center pb-3">
             <activeStyle.Controls
               rows={rows ?? []}
               barField={barField}
               onBarFieldChange={setBarField}
+              barMetric={barMetric}
+              onBarMetricChange={setBarMetric}
               shareYDomain={barShareYDomain}
               onShareYDomainChange={setBarShareYDomain}
+              hasSelection={selectedRows !== null && selectedRows.size > 0}
             />
           </div>
         )}

@@ -18,6 +18,23 @@ export type VizStyleId = 'scatter' | 'bar';
 // position the row.
 export type PositionOf = (row: CyberattacksRow | null | undefined) => [number, number] | null;
 
+// A set of rows selected in one view, to be emphasized in the others. Today
+// only the bar chart creates these; the shape is generic so the scatter can
+// publish its own selections later.
+export interface RowSelection {
+  // Which view created the selection: 'bar' now, 'scatter' later.
+  source: 'bar' | 'scatter';
+  // Stable identity used to toggle this selection on and off.
+  id: string;
+  // The rows the selection covers.
+  rows: CyberattacksRow[];
+  // Provenance for bar selections (unused by other sources).
+  field?: BarField;
+  metric?: BarMetric;
+  pane?: PaneId;
+  key?: string;
+}
+
 // Everything a style renderer needs to draw a single pane. Deliberately does
 // not include shared scales: each pane owns a disjoint subset of the data and
 // therefore computes its own scales.
@@ -44,9 +61,21 @@ export interface PaneContext {
   // a ref, so publishing a function value is safe and requires no updater
   // wrapper.
   setPositionOf: (positionOf: PositionOf | null) => void;
-  // The categorical field the bar style aggregates by. Unused by scatter but
-  // carried on the shared context so style components stay stateless.
+  // The categorical field and quantitative measure the bar style aggregates
+  // by. Unused by scatter but carried on the shared context so style
+  // components stay stateless.
   barField: BarField;
+  barMetric: BarMetric;
+  // Union of every active selection, or null when nothing is selected. The
+  // scatter uses it the same way it uses `highlightedImpact`.
+  selectedRows: ReadonlySet<CyberattacksRow> | null;
+  // Bar panes call this when a bar is clicked so the shell can toggle that
+  // bar's contributing rows into the shared selection. Unused by scatter.
+  onBarSelect: (key: string, contributingRows: CyberattacksRow[]) => void;
+  // Scatter panes call this with the rows inside a completed brush so the shell
+  // can add them to the shared selection (deduplicated against what is already
+  // selected). Unused by bar.
+  onBrushSelect: (rows: CyberattacksRow[]) => void;
 }
 
 // A selectable visualization style. `Pane` draws one pane and `Controls`
@@ -71,7 +100,7 @@ export interface VizStyle {
   // providers that always share (scatter) ignore it.
   sharedYDomain?: (
     rows: CyberattacksRow[],
-    options: { barField: BarField; shareYDomain?: boolean },
+    options: { barField: BarField; metric: BarMetric; shareYDomain?: boolean },
   ) => [number, number] | null;
 }
 
@@ -79,11 +108,21 @@ export interface VizControlsProps {
   rows: CyberattacksRow[];
   barField: BarField;
   onBarFieldChange: (field: BarField) => void;
+  // The quantitative measure the bar y-axis encodes.
+  barMetric: BarMetric;
+  onBarMetricChange: (metric: BarMetric) => void;
   // Bar-style control: when true both panes share one y-domain; when false
   // each pane scales to its own rows.
   shareYDomain: boolean;
   onShareYDomainChange: (share: boolean) => void;
+  // Whether any rows are currently selected. Controls use this to show the
+  // overlay legend only when the overlay layer is actually visible.
+  hasSelection?: boolean;
 }
 
 // Categorical fields the bar style can aggregate by.
 export type BarField = 'attack_type' | 'attack_vector' | 'org_size' | 'impact_data';
+
+// The quantitative measure the bar y-axis encodes: the number of attacks in a
+// category, or the sum of users affected across the rows in it.
+export type BarMetric = 'count' | 'users';

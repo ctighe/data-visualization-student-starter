@@ -20,13 +20,16 @@ export interface RenderMarksOptions {
   // Sensitivity level selected in the shared color legend, or null. When set,
   // every mark matching it is emphasized while the rest fade.
   highlightedImpact: string | null;
+  // Rows selected in another view (e.g. a clicked bar), or null. Used as a
+  // fallback highlight below hover and the legend.
+  selectedRows: ReadonlySet<CyberattacksRow> | null;
 }
 
 export function renderMarks(
   marks: Selection<SVGGElement, unknown, null, undefined>,
   options: RenderMarksOptions,
 ) {
-  const { data, xScale, yScale, xValue, yValue, hoveredIndex, colorFor, highlightedImpact } =
+  const { data, xScale, yScale, xValue, yValue, hoveredIndex, colorFor, highlightedImpact, selectedRows } =
     options;
 
   marks
@@ -39,12 +42,14 @@ export function renderMarks(
     .style('transition', TRANSITION)
     // The hovered mark grows slightly.
     .attr('r', (_d, i) => (i === hoveredIndex ? HOVERED_RADIUS : RADIUS))
-    // A hovered mark takes priority: only it stays at full opacity. Otherwise
-    // a legend selection emphasizes the matching sensitivity across the pane.
+    // Priority: a directly hovered mark > the color-legend highlight > a
+    // linked bar selection. A hovered mark only stays lit itself; the legend
+    // and linked selection emphasize every matching mark in the pane.
     .style('opacity', (d, i) => {
       if (hoveredIndex !== null) return i === hoveredIndex ? 1 : FADED_OPACITY;
       if (highlightedImpact !== null)
         return d.impact_data === highlightedImpact ? 1 : FADED_OPACITY;
+      if (selectedRows) return selectedRows.has(d) ? 1 : FADED_OPACITY;
       return 1;
     });
 }

@@ -32,3 +32,11 @@ export const violinWidthFraction = 0.9; // max fraction of a band the violin fil
 // Violins are drawn as unfilled outlines so the scatter marks stay readable.
 export const violinStroke = '#60a5fa';
 export const violinStrokeWidth = 1;
+
+// Bar chart. The base layer uses `barFill`; when rows are selected an orange
+// overlay layer is drawn on top at reduced opacity, slightly inset so the base
+// bar's edges stay visible around it.
+export const barFill = '#2563eb';
+export const barOverlayFill = '#f97316'; // orange-500
+export const barOverlayOpacity = 0.5;
+export const barOverlayInset = 0.12; // fraction of the band width inset per side

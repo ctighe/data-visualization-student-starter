@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import { Marks } from './Marks';
-import { VoronoiOverlay } from './VoronoiOverlay';
+import { BrushOverlay } from './BrushOverlay';
 import { Violins } from '../violin/Violins';
 import { Axes } from '../shared/Axes';
 import { Labels } from '../shared/Labels';
@@ -23,6 +23,8 @@ export function ScatterPane({
   setHoveredIndex,
   setPositionOf,
   highlightedImpact,
+  selectedRows,
+  onBrushSelect,
 }: PaneContext) {
   const scales = useScatterViolinScales({ rows, width, height, margin, xValue, yValue });
 
@@ -83,6 +85,7 @@ export function ScatterPane({
         hoveredIndex={hoveredIndex}
         colorFor={colorFor}
         highlightedImpact={highlightedImpact}
+        selectedRows={selectedRows}
       />
       <Axes xScale={xScale} yScale={yScale} height={height} margin={margin} />
       <Labels
@@ -95,7 +98,7 @@ export function ScatterPane({
         xLabel={xAxisLabel}
         yLabel={yAxisLabel}
       />
-      <VoronoiOverlay
+      <BrushOverlay
         data={rows}
         xScale={xScale}
         yScale={yScale}
@@ -104,6 +107,7 @@ export function ScatterPane({
         height={height}
         margin={margin}
         setHoveredIndex={setHoveredIndex}
+        onBrushSelect={onBrushSelect}
         showVoronoi={showVoronoi}
       />
     </g>
