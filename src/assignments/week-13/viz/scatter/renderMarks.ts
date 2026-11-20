@@ -1,13 +1,13 @@
 import type { Selection } from 'd3-selection';
 import type { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
 import type { CyberattacksRow } from '../../../week-02/CyberattacksSummary';
+import { HOVERED_MARK_AREA, MARK_AREA, markPath } from './markShapes';
 
-const RADIUS = 3;
-const HOVERED_RADIUS = 4;
 const FADED_OPACITY = 0.2;
 // CSS handles the fades so highlighting the legend or a mark eases in/out
-// instead of snapping.
-const TRANSITION = 'opacity 200ms ease, r 150ms ease';
+// instead of snapping. Size is carried by the path's `d`, which CSS cannot
+// transition, so the hovered mark grows in one step instead of easing.
+const TRANSITION = 'opacity 200ms ease';
 
 export interface RenderMarksOptions {
   data: CyberattacksRow[];
@@ -29,19 +29,33 @@ export function renderMarks(
   marks: Selection<SVGGElement, unknown, null, undefined>,
   options: RenderMarksOptions,
 ) {
-  const { data, xScale, yScale, xValue, yValue, hoveredIndex, colorFor, highlightedImpact, selectedRows } =
-    options;
+  const {
+    data,
+    xScale,
+    yScale,
+    xValue,
+    yValue,
+    hoveredIndex,
+    colorFor,
+    highlightedImpact,
+    selectedRows,
+  } = options;
 
   marks
-    .selectAll('circle')
+    .selectAll('path.mark')
     .data(data)
-    .join('circle')
-    .attr('cx', (d) => xScale(xValue(d)))
-    .attr('cy', (d) => yScale(yValue(d)))
+    .join('path')
+    .attr('class', 'mark')
+    // Shapes are generated centered on the origin, so positioning a mark is a
+    // single translate rather than per-shape cx/cy or x/y/width/height.
+    .attr('transform', (d) => `translate(${xScale(xValue(d))},${yScale(yValue(d))})`)
+    // Circle = Low, square = Medium, triangle = High (unknown -> circle). The
+    // fill comes from the unchanged sensitivity color scale.
+    .attr('d', (d, i) =>
+      markPath(d.impact_data, i === hoveredIndex ? HOVERED_MARK_AREA : MARK_AREA),
+    )
     .attr('fill', (d) => colorFor(d))
     .style('transition', TRANSITION)
-    // The hovered mark grows slightly.
-    .attr('r', (_d, i) => (i === hoveredIndex ? HOVERED_RADIUS : RADIUS))
     // Priority: a directly hovered mark > the color-legend highlight > a
     // linked bar selection. A hovered mark only stays lit itself; the legend
     // and linked selection emphasize every matching mark in the pane.
